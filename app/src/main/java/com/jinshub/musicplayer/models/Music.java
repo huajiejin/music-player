@@ -7,16 +7,16 @@ public class Music {
 	private String artist;
 	private String album;
 	private String duration;
-	private String path;
-	private String albumArt;
+	private Integer musicResourceId;
+	private Integer albumArtResourceId;
 
-	public Music(String title, String artist, String album, String duration, String path, String albumArt) {
+	public Music(String title, String artist, String album, String duration, Integer musicResourceId, Integer albumArtResourceId) {
 		this.title = title;
 		this.artist = artist;
 		this.album = album;
 		this.duration = duration;
-		this.path = path;
-		this.albumArt = albumArt;
+		this.musicResourceId = musicResourceId;
+		this.albumArtResourceId = albumArtResourceId;
 	}
 
 	public String getTitle() {
@@ -33,11 +33,11 @@ public class Music {
 		return duration;
 	}
 
-	public String getPath() {
-		return path;
+	public Integer getMusicResourceId() {
+		return musicResourceId;
 	}
 
-	public String getAlbumArt() {
-		return albumArt;
+	public Integer getAlbumArtResourceId() {
+		return albumArtResourceId;
 	}
 }
