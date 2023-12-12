@@ -2,4 +2,7 @@
 <resources>
     <style name="Base.Theme.MusicPlayer" parent="Theme.Material3.DayNight.NoActionBar"></style>
     <style name="Theme.MusicPlayer" parent="Base.Theme.MusicPlayer"></style>
+    <color name="red">#FF0000</color>
+    <color name="blue">#0000FF</color>
+    <color name="green">#00FF00</color>
 </resources>

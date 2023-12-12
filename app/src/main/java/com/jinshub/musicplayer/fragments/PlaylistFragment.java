@@ -3,64 +3,48 @@ package com.jinshub.musicplayer.fragments;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.jinshub.musicplayer.R;
+import com.jinshub.musicplayer.adapters.PlaylistAdapter;
+import com.jinshub.musicplayer.databinding.FragmentPlaylistBinding;
+import com.jinshub.musicplayer.models.Music;
+import com.jinshub.musicplayer.utils.MusicUtil;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link PlaylistFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.List;
+
 public class PlaylistFragment extends Fragment {
+    private FragmentPlaylistBinding binding;
+    private PlaylistAdapter adapter;
+    private List<Music> songs;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentPlaylistBinding.inflate(inflater, container, false);
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+        binding.recyclerLauncherView.setEdgeItemsCenteringEnabled(true);
 
-    public PlaylistFragment() {
-        // Required empty public constructor
-    }
+        binding.recyclerLauncherView.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        binding.recyclerLauncherView.setLayoutManager(linearLayoutManager);
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PlaylistFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PlaylistFragment newInstance(String param1, String param2) {
-        PlaylistFragment fragment = new PlaylistFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+        // Initialize your songs list here
+        songs = MusicUtil.getDefaultMusicList();
+
+        adapter = new PlaylistAdapter(songs);
+        binding.recyclerLauncherView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+        return binding.getRoot();
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_playlist, container, false);
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }
