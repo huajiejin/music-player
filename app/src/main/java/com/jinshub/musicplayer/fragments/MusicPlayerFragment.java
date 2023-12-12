@@ -1,66 +1,130 @@
 package com.jinshub.musicplayer.fragments;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.jinshub.musicplayer.R;
+import com.jinshub.musicplayer.databinding.FragmentMusicPlayerBinding;
+import com.jinshub.musicplayer.models.Music;
+import com.jinshub.musicplayer.utils.MusicUtil;
+import com.jinshub.musicplayer.viewmodels.MusicViewModel;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link MusicPlayerFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class MusicPlayerFragment extends Fragment {
+    private FragmentMusicPlayerBinding binding;
+    // Tag for logging messages
+    private static final String LOG_TAG = "MusicPlayerFragment";
+    private MusicViewModel musicViewModel;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public MusicPlayerFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MusicPlayerFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static MusicPlayerFragment newInstance(String param1, String param2) {
-        MusicPlayerFragment fragment = new MusicPlayerFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    private Music selectedSong = MusicUtil.getDefaultMusicList().get(0);
+    private MediaPlayer mediaPlayer;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_music_player, container, false);
+        binding = FragmentMusicPlayerBinding.inflate(inflater, container, false);
+
+        musicViewModel = new ViewModelProvider(requireActivity()).get(MusicViewModel.class);
+        musicViewModel.getSelectedSong().observe(getViewLifecycleOwner(), new Observer<Music>() {
+            @Override
+            public void onChanged(Music song) {
+                // play the selected song
+                playSong(song);
+            }
+        });
+
+        // if a song is already selected, display it
+        if (selectedSong != null) {
+            displaySong(selectedSong);
+            binding.playPauseButton.setImageResource(R.drawable.ic_play);
+        }
+
+        // set up the buttons to play the previous song, next song, and play/pause the current song
+        binding.prevButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(LOG_TAG, "prevButton clicked");
+                musicViewModel.selectPrevSong();
+            }
+        });
+
+        binding.nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(LOG_TAG, "nextButton clicked");
+                musicViewModel.selectNextSong();
+            }
+        });
+
+        binding.playPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(LOG_TAG, "playButton clicked");
+                togglePlayingSong(selectedSong);
+            }
+        });
+
+        return binding.getRoot();
+    }
+
+    // Start playing the music
+    public void playSong(Music song) {
+        Log.i(LOG_TAG, "playSong("+ song.getTitle() +")");
+        if (song == null) {
+            Log.i(LOG_TAG, "song is null");
+            return;
+        }
+        if (song != selectedSong) {
+            selectedSong = song;
+            displaySong(song);
+        }
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+        }
+        int resourceId = song.getMusicResourceId();
+        mediaPlayer = MediaPlayer.create(getActivity(), resourceId);
+
+        mediaPlayer.start();
+        binding.playPauseButton.setImageResource(R.drawable.ic_pause);
+    }
+    
+    // Pause the music if it is playing, or play the music if it is paused
+    public void togglePlayingSong(Music song) {
+        Log.i(LOG_TAG, "togglePlayingSong("+ song.getTitle() +")");
+        if (song == null) {
+            Log.i(LOG_TAG, "song is null");
+            return;
+        }
+        if (song != selectedSong) {
+            selectedSong = song;
+            displaySong(song);
+        }
+        if (mediaPlayer == null) {
+            playSong(song);
+        } else if (mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+        } else {
+            mediaPlayer.start();
+        }
+        if (mediaPlayer.isPlaying()) {
+            binding.playPauseButton.setImageResource(R.drawable.ic_pause);
+        } else {
+            binding.playPauseButton.setImageResource(R.drawable.ic_play);
+        }
+    }
+
+    // Display the song's title, album art, and artist name
+    public void displaySong(Music song) {
+        binding.songTitle.setText(song.getTitle());
+        binding.albumArt.setImageResource(song.getAlbumArtResourceId());
+        binding.artistName.setText(song.getArtist());
     }
 }

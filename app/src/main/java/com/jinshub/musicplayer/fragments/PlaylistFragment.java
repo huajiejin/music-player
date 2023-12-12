@@ -3,6 +3,7 @@ package com.jinshub.musicplayer.fragments;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
@@ -14,13 +15,14 @@ import com.jinshub.musicplayer.adapters.PlaylistAdapter;
 import com.jinshub.musicplayer.databinding.FragmentPlaylistBinding;
 import com.jinshub.musicplayer.models.Music;
 import com.jinshub.musicplayer.utils.MusicUtil;
+import com.jinshub.musicplayer.viewmodels.MusicViewModel;
 
 import java.util.List;
 
 public class PlaylistFragment extends Fragment {
     private FragmentPlaylistBinding binding;
     private PlaylistAdapter adapter;
-    private List<Music> songs;
+    private MusicViewModel musicViewModel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -32,10 +34,8 @@ public class PlaylistFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         binding.recyclerLauncherView.setLayoutManager(linearLayoutManager);
 
-        // Initialize your songs list here
-        songs = MusicUtil.getDefaultMusicList();
-
-        adapter = new PlaylistAdapter(songs);
+        musicViewModel = new ViewModelProvider(requireActivity()).get(MusicViewModel.class);
+        adapter = new PlaylistAdapter(musicViewModel);
         binding.recyclerLauncherView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 
