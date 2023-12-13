@@ -125,6 +125,6 @@ public class MusicPlayerFragment extends Fragment {
     public void displaySong(Music song) {
         binding.songTitle.setText(song.getTitle());
         binding.albumArt.setImageResource(song.getAlbumArtResourceId());
-        binding.artistName.setText(song.getArtist());
+//        binding.artistName.setText(song.getArtist());
     }
 }
